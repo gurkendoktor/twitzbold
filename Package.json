@@ -1,0 +1,9 @@
+{ 
+"name":"tw_test001",
+"version":"0.0.1",
+"description":"my twitter test",
+"dependencies" :
+  { "socket.io" : "0.9.13"
+  , "twitter" : "latest"
+  }
+}
