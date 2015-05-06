@@ -1,0 +1,116 @@
+
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>Twitter gucken</title>
+	<script src="assets/socket.io.min.js"></script>
+	<script src="assets/jquery-1.7.2.min.js"></script>
+	<style>
+	body{
+		font-family:"Helvetica Neue";
+	}
+	#tweets div.tweet{
+		color: #333;
+		background-color:#E1EEFA;
+		width:400px;
+		padding:5px;
+		font-size:15px;
+		font-weight:200;
+		line-height:22px;
+		border:1px solid #ccc;
+		margin-top:5px;
+		border-radius:2px;	
+	}
+	#keywords{
+		margin-top:10px;
+		margin-bottom:10px;		
+	}
+	#rate{
+		font-size:12px;
+	}
+	div.keyword{
+		height:20px;
+		font-size:12px; 
+		padding:4px;
+		border-radius: 4px;
+		background-color: #E4F4FE;
+		border:2px solid #44C1F0;
+		width:auto;
+		cursor:pointer;
+		display:inline;
+		margin:5px;
+	}
+	#marco input{
+		font-size:15px;
+	}
+	
+	
+	</style>
+	</head>
+<body>
+<h1>Twitter gucken</h1>
+<p id="rate">0/s<p>
+<form name="marco" id="marco" action="#">
+	<input name="topic" id="topic"><input id="submit" type = "submit" value="Themawechsel"> <input type="button" id="stop" value="Ruhe!">
+	</form>
+<div id="keywords"><span>Keywords: </div>
+<div id="tweets">
+
+
+</div>
+<script>
+	$(document).ready(function(){
+		console.log($("marco"));
+		$("#stop").on("click", function(event){
+			socket.emit('stop');
+		});
+		$("#marco").on("submit", function(event){
+  			event.preventDefault();
+//			console.log(event);
+			var keyword = $("#topic").val();
+			$("#topic").val('');
+			console.log(keyword);
+			console.log(socket);
+			socket.emit('keyword', keyword);
+			var elem = $('<div class="keyword">').text(keyword).hide();
+			$('#keywords').append(elem);
+			$(elem).on('click', function(e){
+				socket.emit('untrack', keyword);
+				$(this).fadeOut(200);
+			});
+			$(elem).fadeIn();
+//			return false;
+		});
+
+		
+		
+		var socket = io.connect('127.0.0.1:8081',function(){
+            console.log('on connect');
+        });
+
+		socket.on('connect', function(data){
+			console.log('connect');
+        });
+		
+		socket.on('clienterror', function(data){
+			console.log("ERRRRRR");
+		});
+		
+		socket.on('tweet', function(data){
+			var elem = $('<div class="tweet">').text(data).hide();
+			$('#tweets').prepend(elem);
+			elem.fadeIn(300);
+		});
+		socket.on('rate', function(data){
+			var txt = data + ' tweeps';
+			$("#rate").text(txt);
+		});
+
+		
+	});
+
+	</script>
+
+</body>
+</html>
